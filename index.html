@@ -6,57 +6,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="img/prod1/favicon.jpg" type="image/x-icon">
     <title>Memories Shop</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Header Section -->
+    
     <header>
       <h1>Memories Shop</h1>
     </header>
 
-    <!-- Product Content Section -->
+   
     <div class="product-page">
-      <!-- Main Product Image -->
+      
       <div class="main-image">
-        <img src="img/prod1/3.jpg" alt="Main Product Image" />
+        <img src="img/prod1/1.jpg"  alt="Main Product Image" />
       </div>
 
-      <!-- Product Details -->
+      
       <div class="product-details">
-        <h2>Moon Lamp</h2>
-        <p class="price">2.999 RSD</p>
+        <h2>Lampe sa slikom po želji</h2>
+
+        <button
+        class="order-button"
+        onclick="document.getElementById('price').scrollIntoView({behavior: 'smooth'})"
+        >
+        Poruči odmah
+        </button>
+        
         <p class="description">
-          Izrada lampi sa bilo kakvom slikom po želji (SLIKA DECE/SA
-          PARTNEROM/KUĆNIM LJUBIMCIMA) LED lampa u obliku meseca sa vašim
-          fotografijama🌕 Ako želite iznenaditi voljenu osobu ovo je baš pravi
-          izbor za vas🥰.
+            LED lampe sa slikom su idealan poklon za svaku priliku od rodjendana i slava pa sve do venčanja🥰.
+        </p>
+        <p class="description">
+            Izrada lampi sa vašom slikom po želji.
+        </p>
+         <p class="description">
+             Moguća izrada slika sa partnerom, slike dece, kućnih ljubimaca ili pak logo firme ili omiljenog kluba.
+        </p>
+        <p class="description">
+            Na lampi mogu biti od 1 do najviše 8 osoba/životinja.
+        </p>
+        <p class="description">
+            Uz svaku lampu se dobija gratis stalak i strujni adapter.
         </p>
 
-        <!-- Order Button Section -->
-<button
-class="order-button"
-onclick="document.getElementById('checkout-section').scrollIntoView({behavior: 'smooth'})"
->
-Poruči odmah
-</button>
 
-<!-- Pinterest-style Image Gallery -->
-<div class="image-gallery">
-<img src="img/prod1/1.jpg" loading="lazy" alt="Gallery Image 1" />
-<img src="img/prod1/2.jpg" loading="lazy" alt="Gallery Image 2" />
-<img src="img/prod1/3.jpg" loading="lazy" alt="Gallery Image 3" />
-<img src="img/prod1/4.jpg" loading="lazy" alt="Gallery Image 4" />
-<!-- Add more images as needed -->
+        <div class="image-gallery">
+        <img src="img/prod1/2.jpg" loading="lazy" alt="Gallery Image 1" />
+        <img src="img/prod1/3.jpg" loading="lazy" alt="Gallery Image 2" />
+        <img src="img/prod1/4.jpg" loading="lazy" alt="Gallery Image 3" />
+        <img src="img/prod1/5.jpg" loading="lazy" alt="Gallery Image 4" />
+        
+        </div>
+       
+<div id="price">
+  <p class="price">2.999 RSD</p>
+  <p class="price new-price">1.980 RSD</p>
 </div>
 
-<!-- Checkout Section -->
 <div id="checkout-section">
+
 <div id="checkout-form">
-  <form id="order-form" enctype="multipart/form-data">
+  <form action="process.php" id="order-form" enctype="multipart/form-data">
     <label for="ime">Ime *</label>
     <input type="text" name="ime" id="ime" required />
     
@@ -74,13 +83,7 @@ Poruči odmah
     
     <label for="broj">Telefon *</label>
     <input type="tel" name="broj" id="broj" required />
-    
-    <label for="email">Email *</label>
-    <input type="email" name="email" id="email" required />
-    
-    <label for="kolicina">Količina proizvoda</label>
-    <input type="number" name="kolicina" id="kolicina" value="1" min="1" max="10" />
-    
+     
     <label for="file">Slika *</label>
     <input type="file" name="file[]" id="file" required multiple />
     
@@ -89,32 +92,28 @@ Poruči odmah
   
  
 </div>
-
-<div id="order-summary">
-  <h2>Vaša narudžbina</h2>
-  <div class="summary-item">
-    <p>Lampa</p>
-    <span>2.999 rsd</span>
+  <div id="order-summary">
+    <h2>Vaša narudžbina</h2>
+    <div class="summary-item">
+      <p>Lampa</p>
+      <span></span>
+    </div>
+    <div class="summary-item">
+      <p>Dostava</p>
+      <span></span>
+    </div>
+    <div class="summary-total">
+      <p>Ukupno</p>
+      <span></span>
   </div>
-  <div class="summary-item">
-    <p>Dostava</p>
-    <span>Besplatna</span>
-  </div>
-  <div class="summary-total">
-    <p>Ukupno</p>
-    <span>2.999 rsd</span>
-
-
-
-  </div>
-  <!-- Popup Container -->
+ 
 <div id="popup" class="popup hidden">
   <div class="popup-content">
     <p id="popup-message"></p>
     <button id="close-popup">Zatvori</button>
   </div>
 </div>
-<!-- Loading Spinner -->
+
 <div id="loading-spinner" class="loading hidden">
   <div class="spinner"></div>
 </div>
@@ -123,10 +122,11 @@ Poruči odmah
 </div>
 </div>
 
-<!-- Footer Section -->
+
     <footer>
     <p>&copy; 2024 Memories Shop. All rights reserved.</p>
     </footer>
-  <script defer src="js/app.js"></script>
+    
+  <script src="js/app.js" defer></script>
   </body>
 </html>

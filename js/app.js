@@ -1,21 +1,33 @@
 document.addEventListener("DOMContentLoaded", (event) => {
-  var num = document.getElementById("kolicina");
+  const fileInput = document.getElementById("file");
 
-  num.addEventListener("change", () => {
-    broj = num.value;
-    const lampaItem = document.querySelector(".summary-item p");
-    const totalPrice = document.querySelector(".summary-total span");
-    const summaryItems = document.querySelectorAll(".summary-item");
-    const lampaPrice = summaryItems[0].querySelector("span"); // Price of "Lampa"
-    const dostavaPrice = summaryItems[1].querySelector("span"); // Price of "Dostava"
-    lampaItem.textContent = broj + "x Lampa";
+  fileInput.addEventListener("change", () => {
+    const brojSlika = fileInput.files.length;
 
-    lampaInt = broj * 2999;
-    dostavaInt = Math.round(parseFloat(lampaInt) / 10);
-    lampaPrice.textContent = lampaInt + "rsd";
-    //dostavaPrice.textContent = 'Besplatna';
-    totalPrice.textContent = lampaInt + "rsd";
-    //totalPrice.textContent = lampaInt + dostavaInt + "rsd";
+    const lampaText = document.querySelector(
+      "#order-summary .summary-item:nth-child(2) p"
+    );
+    const lampaPrice = document.querySelector(
+      "#order-summary .summary-item:nth-child(2) span"
+    );
+    const dostavaPrice = document.querySelector(
+      "#order-summary .summary-item:nth-child(3) span"
+    );
+    const totalPrice = document.querySelector(
+      "#order-summary .summary-total span"
+    );
+
+    // Calculate prices
+    const price = 1980;
+    const lampaInt = brojSlika * price;
+    const dostavaInt = 450; // Free delivery
+    const ukupno = lampaInt + dostavaInt;
+
+    // Update text and prices in the HTML
+    lampaText.textContent = `${brojSlika}x Lampa`;
+    lampaPrice.textContent = `${lampaInt} rsd`;
+    totalPrice.textContent = `${ukupno} rsd`;
+    dostavaPrice.textContent = `${dostavaInt} rsd`;
   });
 });
 
@@ -36,7 +48,20 @@ document
       method: "POST",
       body: formData,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Read response as text
+      })
+      .then((text) => {
+        try {
+          return JSON.parse(text); // Parse JSON response
+        } catch (error) {
+          console.error("Invalid JSON:", text);
+          throw new Error("Server returned invalid JSON");
+        }
+      })
       .then((data) => {
         const popup = document.getElementById("popup");
         const popupMessage = document.getElementById("popup-message");

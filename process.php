@@ -1,75 +1,87 @@
 <?php
 header('Content-Type: application/json'); // Ensure JSON response
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $to = "patakigor2000@gmail.com"; // Replace with recipient email
-    $subject = "New Order from Memories Shop";
-    $from = "danieldanko78@gmail.com"; // Replace with your email
+// Include PHPMailer's class files
+require 'vendor/PHPMailer-6.9.3/src/Exception.php';
+require 'vendor/PHPMailer-6.9.3/src/PHPMailer.php';
+require 'vendor/PHPMailer-6.9.3/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$response = ["status" => "error", "message" => "An unknown error occurred."];
+
+try {
+    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        throw new Exception("Invalid request method.");
+    }
 
     // Gather form data
+    $requiredFields = ['ime', 'prezime', 'adresa', 'grad', 'postanski', 'broj'];
+    foreach ($requiredFields as $field) {
+        if (empty($_POST[$field])) {
+            throw new Exception("Field {$field} is required.");
+        }
+    }
+
     $name = $_POST['ime'];
     $surname = $_POST['prezime'];
     $address = $_POST['adresa'];
     $city = $_POST['grad'];
     $postal = $_POST['postanski'];
     $phone = $_POST['broj'];
-    $email = $_POST['email'];
-    $kolicina = $_POST['kolicina'];
-    $cena = $kolicina * 2999;
+    $kolicina = isset($_FILES['file']['name']) ? count($_FILES['file']['name']) : 0;
+    $cena = $kolicina * 1980;
+    $dostava = 450;
 
-    // MIME boundary
-    $separator = md5(time());
-    
-    // Headers
-    $headers = "From: $from\r\n";
-    $headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: multipart/mixed; boundary=\"$separator\"\r\n";
-    
-    // Message body
-    $message = "--$separator\r\n";
-    $message .= "Content-Type: text/plain; charset=\"UTF-8\"\r\n";
-    $message .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
-    
-    $message .= "Nova porudzbina:\n";
-    $message .= "Ime: $name $surname\n";
-    $message .= "Adresa: $address, $city\n";
-    $message .= "Postanski broj: $postal\n";
-    $message .= "Broj telefona: $phone\n";
-    $message .= "Email: $email\n";
-    $message .= "Broj proizvoda: $kolicina\n";
-    $message .= "Total Cena: $cena\n\n";
+    // PHPMailer setup
+    $mail = new PHPMailer(true);
 
-    // Process each uploaded file
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'danieldanko78@gmail.com'; // Replace with your email
+    $mail->Password = 'vron pipg kjer xijx'; // Replace with your app password
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = 587;
+
+    // Recipients
+    $mail->setFrom('danieldanko78@gmail.com', 'Memories Shop');
+    $mail->addAddress('patakigor2000@gmail.com');
+
+    // Email content
+    $mail->isHTML(false);
+    $mail->Subject = 'New Order from Memories Shop';
+    $mail->Body    = "Nova porudzbina:\n" .
+                     "Ime: $name $surname\n" .
+                     "Adresa: $address, $city\n" .
+                     "Postanski broj: $postal\n" .
+                     "Broj telefona: $phone\n" .
+                     "Broj proizvoda: $kolicina\n" .
+                     "Total Cena: $cena rsd\n";
+
+    // Attachments
     if (isset($_FILES['file']) && is_array($_FILES['file']['tmp_name'])) {
         foreach ($_FILES['file']['tmp_name'] as $index => $tmp_name) {
             if ($_FILES['file']['error'][$index] == UPLOAD_ERR_OK) {
                 $file_tmp = $tmp_name;
                 $file_name = $_FILES['file']['name'][$index];
-                $file_type = $_FILES['file']['type'][$index];
-
-                // Encode file content
-                $file_content = chunk_split(base64_encode(file_get_contents($file_tmp)));
-
-                // Add each file as a separate part
-                $message .= "--$separator\r\n";
-                $message .= "Content-Type: $file_type; name=\"$file_name\"\r\n";
-                $message .= "Content-Transfer-Encoding: base64\r\n";
-                $message .= "Content-Disposition: attachment; filename=\"$file_name\"\r\n\r\n";
-                $message .= $file_content . "\r\n\r\n";
+                $mail->addAttachment($file_tmp, $file_name);
             }
         }
     }
 
-    // End MIME boundary
-    $message .= "--$separator--";
-
     // Send email
-    if (mail($to, $subject, $message, $headers)) {
-        echo json_encode(["status" => "success", "message" => "Vaša narudžbina je uspešno poslata! Hvala što ste poručili kod nas."]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Nažalost, narudžbina nije poslata zbog greške. Pokušajte ponovo ili nas kontaktirajte za pomoć."]);
-    }
-} else {
-    echo json_encode(["status" => "error", "message" => "Nažalost, nije moguće obraditi vašu narudžbinu. Molimo Vas da pokušate ponovo ili nas kontaktirajte."]);
+    $mail->send();
+    $response = ["status" => "success", "message" => "Va分a narud弔bina je uspe分no poslata!"];
+} catch (Exception $e) {
+    error_log($e->getMessage()); // Log error for debugging
+    $response['message'] = $e->getMessage();
 }
+
+echo json_encode($response);
 ?>
